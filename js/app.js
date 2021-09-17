@@ -8,6 +8,35 @@ const sintomasInput = document.querySelector("#sintomas");
 //UX
 const form = document.querySelector("#nueva-cita");
 const contenedorCitas = document.querySelector("#citas");
+//Clases
+class Citas {
+    constructor(){
+        this.citas = [];
+    }
+}
+class UI{
+    mostrarAlerta(mensaje, tipo){
+        //Crear la alerta para mostrar
+        const divMensaje = document.createElement("div");
+        divMensaje.textContent = mensaje; 
+        divMensaje.classList.add("text-center", "alert", "d-block", "col-12");
+        //si es tipo error o no
+        if(tipo === "error"){
+            divMensaje.classList.add("alert-danger");
+
+        }else{
+            divMensaje.classList.add("alert-success");
+        }
+        //Agregar al dom
+        document.querySelector("#contenido").insertBefore(divMensaje, document.querySelector(".agregar-cita"));
+
+        setTimeout( ()=>{
+            divMensaje.remove();
+        }, 3000)
+    }
+}
+const ui = new UI();
+const citasAdmn = new Citas();
 //Objeto de cita
 const citaObj = {
     mascota: "",
@@ -26,9 +55,23 @@ function addEvenetListeners(){
     fechaInput.addEventListener("input", datosCita );
     horaInput.addEventListener("input", datosCita );
     sintomasInput.addEventListener("input", datosCita );
+
+    form.addEventListener("submit", nuevaCita);
 }
 //Llena el objeto de citas
 function datosCita(e){
     citaObj[e.target.name] = e.target.value; // [e.target.name] = al name del input, en este caso "mascota"
     console.log(citaObj);
+}
+//Valida y agrega una nueva cita a la clase de citas
+function nuevaCita (e) {
+    e.preventDefault();
+
+    //Extraer la info del arreglo de cita
+
+    const {mascota, propietario, telefono, fecha, hora, sintomas} = citaObj;
+    if(mascota === "" || propietario === "" || telefono === "" || fecha === "" || hora === "" || sintomas === ""){
+        ui.mostrarAlerta("Todos los campos son obligatorios", "error");
+        return;   
+    }
 }
