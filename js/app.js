@@ -13,6 +13,10 @@ class Citas {
     constructor(){
         this.citas = [];
     }
+    agregarCita(cita){
+        this.citas = [...this.citas, cita];
+        console.log(this.citas);
+    }
 }
 class UI{
     mostrarAlerta(mensaje, tipo){
@@ -61,7 +65,6 @@ function addEvenetListeners(){
 //Llena el objeto de citas
 function datosCita(e){
     citaObj[e.target.name] = e.target.value; // [e.target.name] = al name del input, en este caso "mascota"
-    console.log(citaObj);
 }
 //Valida y agrega una nueva cita a la clase de citas
 function nuevaCita (e) {
@@ -74,4 +77,20 @@ function nuevaCita (e) {
         ui.mostrarAlerta("Todos los campos son obligatorios", "error");
         return;   
     }
+    citaObj.id = Date.now();
+    citasAdmn.agregarCita({...citaObj});
+
+    //Reinicia el form
+    form.reset();
+    reiniciarObjeto();
+
+    //Mostrar HTML De La Citas
+}
+function reiniciarObjeto (){
+    citaObj.mascota = "";
+    citaObj.propietario = "";
+    citaObj.telefono = "";
+    citaObj.fecha = "";
+    citaObj.hora = "";
+    citaObj.sintomas = "";
 }
