@@ -38,6 +38,58 @@ class UI{
             divMensaje.remove();
         }, 3000)
     }
+
+    imprimirCitas({citas}){
+        this.limpiarHTML();
+        citas.forEach( (cita)=>{
+            const {mascota, propietario, telefono, fecha, hora, sintomas, id} = cita;
+            const divCita = document.createElement("div");
+            divCita.classList.add("cita", "p-3");
+            divCita.dataset.id = id;
+            
+            //Scripting de los elementos de la cita
+            const mascotaParrafo = document.createElement("h2");
+            mascotaParrafo.classList.add("card-title", "font-weight-bolder");
+            mascotaParrafo.textContent = mascota;
+
+            const propietarioParrafo = document.createElement("P");
+            propietarioParrafo.innerHTML = `
+                <span class="font-weight-bolder">Propietario: </span> ${propietario}
+            `;
+            const telefonoParrafo = document.createElement("P");
+            telefonoParrafo.innerHTML = `
+                <span class="font-weight-bolder">telefono: </span> ${telefono}
+            `;
+            const fechaParrafo = document.createElement("P");
+            fechaParrafo.innerHTML = `
+                <span class="font-weight-bolder">fecha: </span> ${fecha}
+            `;
+            const horaParrafo = document.createElement("P");
+            horaParrafo.innerHTML = `
+                <span class="font-weight-bolder">hora: </span> ${hora}
+            `;
+            const sintomasParrafo = document.createElement("P");
+            sintomasParrafo.innerHTML = `
+                <span class="font-weight-bolder">sintomas: </span> ${sintomas}
+            `;
+
+            //Agregar los parrafos al divCita
+            divCita.append(mascotaParrafo);
+            divCita.append(propietarioParrafo);
+            divCita.append(telefonoParrafo);
+            divCita.append(fechaParrafo);
+            divCita.append(horaParrafo);
+            divCita.append(sintomasParrafo);
+
+            //Agregar las citas al HTML
+            contenedorCitas.append(divCita);
+        })
+    }
+    limpiarHTML(){
+        while(contenedorCitas.firstChild){
+            contenedorCitas.removeChild(contenedorCitas.firstChild);
+        }
+    }
 }
 const ui = new UI();
 const citasAdmn = new Citas();
@@ -85,7 +137,9 @@ function nuevaCita (e) {
     reiniciarObjeto();
 
     //Mostrar HTML De La Citas
+    ui.imprimirCitas(citasAdmn);
 }
+
 function reiniciarObjeto (){
     citaObj.mascota = "";
     citaObj.propietario = "";
