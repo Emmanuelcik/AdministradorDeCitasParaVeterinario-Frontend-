@@ -134,8 +134,13 @@ const citaObj = {
     hora: "",
     sintomas: "",
 }
+window.onload = function () {
+    addEvenetListeners();
+
+    createDB();
+}
 //Eventos
-addEvenetListeners();
+
 function addEvenetListeners(){
     mascotaInput.addEventListener("input", datosCita );
     propietarioInput.addEventListener("input", datosCita );
@@ -229,4 +234,40 @@ function cargarEdicion(cita){
     form.querySelector("button[type='submit']").textContent = "Guardar Cambios";
     editando = true;
 
+}
+
+function createDB(){
+    const crearDB = window.indexedDB.open("citas", 1);
+
+    //Si hay un error
+    crearDB.onerror = function (){
+        console.loh("error");
+    }
+    //si todo sale bien
+    crearDB.onsuccess = function () {
+        console.log("BD creada");
+
+        DB = crearDB.result;
+        console.log(DB);
+    }
+
+    crearDB.onupgradeneeded = function (e) {
+        const db = e.target.result;
+
+        const objectStore = db.createObjectStore("citas",{
+            KeyPath: "id",
+            autoIncrement: true,
+        });
+
+        //Definir todas las columnas
+        objectStore.createIndex("mascota", "mascota", {unique: false});
+        objectStore.createIndex("propietario", "propietario", {unique: false});
+        objectStore.createIndex("telefono", "telefono", {unique: false});
+        objectStore.createIndex("fecha", "fecha", {unique: false});
+        objectStore.createIndex("hora", "hora", {unique: false});
+        objectStore.createIndex("sintomas", "sintomas", {unique: false});
+        objectStore.createIndex("id", "id", {unique: true});
+
+        console.log("Db creada y lista");
+    }
 }
