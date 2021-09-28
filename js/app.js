@@ -110,6 +110,7 @@ class UI{
             botonEditar.innerHTML = `Editar <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>`;
+            const cita = cursor.value;
             botonEditar.onclick = () => cargarEdicion(cita);
 
             //Agregar los parrafos al divCita
@@ -182,13 +183,26 @@ function nuevaCita (e) {
         return;
     }
     if(editando){
-        ui.mostrarAlerta("Editado Correctamente");
-        //Pasar el objeto de la cita a edición
-        citasAdmn.editarCita ({...citaObj});
-        //Regresar el texto de boton al estado original
-        form.querySelector("button[type='submit']").textContent = "Agregar Cita";
-        //quitar modo edicion
-        editando = false;
+        citasAdmn.editarCita({...citaObj});
+        //Edita en index db 
+        const transaction = DB.transaction(["citas"], "readwrite");
+        const objectStore = transaction.objectStore("citas");
+        objectStore.put(citaObj);
+
+        transaction.oncomplete = function () {
+            ui.mostrarAlerta("Editado Correctamente");
+            //Pasar el objeto de la cita a edición
+            // citasAdmn.editarCita ({...citaObj});
+            //Regresar el texto de boton al estado original
+            form.querySelector("button[type='submit']").textContent = "Agregar Cita";
+            //quitar modo edicion
+            editando = false;
+        }
+        transaction.onerror = function (e) {
+            console.error(e);
+        }
+
+        
     }else {
         //Nuevo registro en la base de datos
 
