@@ -52,10 +52,21 @@ class UI{
         }, 3000)
     }
 
-    imprimirCitas({citas}){
+    imprimirCitas(){
         this.limpiarHTML();
-        citas.forEach( (cita)=>{
-            const {mascota, propietario, telefono, fecha, hora, sintomas, id} = cita;
+        
+        this.limpiarHTML();
+        //Leer el contenido de la bd
+        const objectStore = DB.transaction("citas").objectStore("citas");
+        const total = objectStore.count();
+        // const fnTexto = this.textoHeading();
+        total.onsuccess = function (){
+
+        }
+        objectStore.openCursor().onsuccess = function (e){
+            const cursor = e.target.result;
+            if(cursor){
+                const {mascota, propietario, telefono, fecha, hora, sintomas, id} = cursor.value;
             const divCita = document.createElement("div");
             divCita.classList.add("cita", "p-3");
             divCita.dataset.id = id;
@@ -115,7 +126,10 @@ class UI{
                 
             //Agregar las citas al HTML
             contenedorCitas.append(divCita);
-        })
+
+            cursor.continue();
+            }
+        }
     }
     limpiarHTML(){
         while(contenedorCitas.firstChild){
@@ -204,7 +218,7 @@ function nuevaCita (e) {
     reiniciarObjeto();
 
     //Mostrar HTML De La Citas
-    ui.imprimirCitas(citasAdmn);
+    ui.imprimirCitas();
 }
 
 function reiniciarObjeto (){
@@ -222,7 +236,7 @@ function eliminarCita(id){
     //mostrar mensaje
     ui.mostrarAlerta("Cita eliminada correctamente");
     //Refresque las citas
-    ui.imprimirCitas(citasAdmn);
+    ui.imprimirCitas();
 }
 
 //Carga los datos y el modo edicion
@@ -261,7 +275,8 @@ function createDB(){
     //si todo sale bien
     crearDB.onsuccess = function () {
         DB = crearDB.result;
-        console.log(DB);
+
+        ui.imprimirCitas();
     }
 
     crearDB.onupgradeneeded = function (e) {
