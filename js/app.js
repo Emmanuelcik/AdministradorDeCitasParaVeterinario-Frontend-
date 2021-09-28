@@ -9,6 +9,7 @@ const sintomasInput = document.querySelector("#sintomas");
 const form = document.querySelector("#nueva-cita");
 const contenedorCitas = document.querySelector("#citas");
 let editando;
+let DB;
 //Clases
 class Citas {
     constructor(){
@@ -175,12 +176,26 @@ function nuevaCita (e) {
         //quitar modo edicion
         editando = false;
     }else {
+        //Nuevo registro en la base de datos
+
         //Genera id para la cita
         citaObj.id = Date.now();
         //manda el ovjeto de cita
         citasAdmn.agregarCita({...citaObj});
-        //MEnsaje de agregado 
-        ui.mostrarAlerta("Se agrego correctamente");
+
+        //Insertar registro en indexedDB
+        const transaction = DB.transaction(["citas"], "readwrite");
+        //Habilitar el object store
+        const objectStore = transaction.objectStore("citas");
+        //Insertar en la base de datos
+        objectStore.add(citaObj);
+        transaction.oncomplete = function (){
+            console.log("cita agregada");
+            //MEnsaje de agregado 
+            ui.mostrarAlerta("Se agrego correctamente");
+        }
+
+        
     }
     
 
@@ -245,8 +260,6 @@ function createDB(){
     }
     //si todo sale bien
     crearDB.onsuccess = function () {
-        console.log("BD creada");
-
         DB = crearDB.result;
         console.log(DB);
     }
@@ -267,7 +280,5 @@ function createDB(){
         objectStore.createIndex("hora", "hora", {unique: false});
         objectStore.createIndex("sintomas", "sintomas", {unique: false});
         objectStore.createIndex("id", "id", {unique: true});
-
-        console.log("Db creada y lista");
     }
 }
