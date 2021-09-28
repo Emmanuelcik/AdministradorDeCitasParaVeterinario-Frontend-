@@ -103,8 +103,8 @@ class UI{
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>`;
 
-
-            boton.onclick = () => eliminarCita(id);
+            const nuevoId = id;
+            boton.onclick = () => eliminarCita(nuevoId);
             const botonEditar = document.createElement("button");
             botonEditar.classList.add("btn", "btn-info");
             botonEditar.innerHTML = `Editar <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -245,12 +245,20 @@ function reiniciarObjeto (){
 }
 
 function eliminarCita(id){
-    //Eliminar la cita 
-    citasAdmn.eliminarCita(id);
-    //mostrar mensaje
-    ui.mostrarAlerta("Cita eliminada correctamente");
-    //Refresque las citas
-    ui.imprimirCitas();
+    
+    const transaction = DB.transaction(["citas"], "readwrite");
+    const objectStore = transaction.objectStore("citas");
+    objectStore.delete(id);
+
+    transaction.oncomplete = function (){
+        ui.imprimirCitas();
+        console.log("borrada");
+    }
+
+    transaction.onerror = function (){
+        console.log("error");
+    }
+    
 }
 
 //Carga los datos y el modo edicion
